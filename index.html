@@ -1,1 +1,137 @@
-<h1>这是我的第一个网站</h1>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中计计量检测有限公司</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cert-gold': '#B38B24',
+                        'cert-yellow': '#FFF4CC',
+                        'cert-border': '#e5e5e5',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white">
+<div class="w-full">
+
+    <!-- 顶部金色条 -->
+    <div class="bg-cert-gold text-white text-center py-3 text-base">扫描证书验真</div>
+
+    <!-- 查询结果金色条 -->
+    <div class="bg-cert-gold text-white px-2.5 py-2 text-sm mt-2.5 w-full">查询结果</div>
+
+    <!-- 输入框 -->
+    <div class="px-2.5 mt-4 sm:mt-5 mb-2">
+        <input type="text" id="certNo" placeholder="请输入证书/报告编号或条码号"
+               class="w-full px-3 py-2.5 border border-cert-border rounded text-[13px] text-gray-500 placeholder-gray-400">
+    </div>
+    <div class="px-2.5 mt-3 mb-2">
+        <input type="text" id="certUnit" placeholder="请输入证书单位（两个字以上）"
+               class="w-full px-3 py-2.5 border border-cert-border rounded text-[13px] text-gray-500 placeholder-gray-400">
+    </div>
+
+    <!-- 结果表格 -->
+    <div class="border border-t-0 border-cert-border mx-2.5">
+        <div class="flex border-b border-cert-border">
+            <div class="w-20 sm:w-28 bg-cert-yellow py-2.5 px-2 text-center text-[13px] border-r border-cert-border shrink-0">证书编号</div>
+            <div class="flex-1 py-2.5 px-2 text-[13px]" id="certNoCell"></div>
+        </div>
+        <div class="flex border-b border-cert-border">
+            <div class="w-20 sm:w-28 bg-cert-yellow py-2.5 px-2 text-center text-[13px] border-r border-cert-border shrink-0">送检单位</div>
+            <div class="flex-1 py-2.5 px-2 text-[13px]" id="certUnitCell"></div>
+        </div>
+        <div class="flex border-b border-cert-border">
+            <div class="w-20 sm:w-28 bg-cert-yellow py-2.5 px-2 text-center text-[13px] border-r border-cert-border shrink-0">器具名称</div>
+            <div class="flex-1 py-2.5 px-2 text-[13px]" id="deviceName"></div>
+        </div>
+        <div class="flex border-b border-cert-border">
+            <div class="w-20 sm:w-28 bg-cert-yellow py-2.5 px-2 text-center text-[13px] border-r border-cert-border shrink-0">型号/规格</div>
+            <div class="flex-1 py-2.5 px-2 text-[13px]" id="modelSpec"></div>
+        </div>
+        <div class="flex border-b border-cert-border">
+            <div class="w-20 sm:w-28 bg-cert-yellow py-2.5 px-2 text-center text-[13px] border-r border-cert-border shrink-0">样品编号</div>
+            <div class="flex-1 py-2.5 px-2 text-[13px]" id="sampleNo"></div>
+        </div>
+        <div class="flex border-b border-cert-border">
+            <div class="w-20 sm:w-28 bg-cert-yellow py-2.5 px-2 text-center text-[13px] border-r border-cert-border shrink-0">制造厂家</div>
+            <div class="flex-1 py-2.5 px-2 text-[13px]" id="manufacturer"></div>
+        </div>
+        <div class="flex">
+            <div class="w-20 sm:w-28 bg-cert-yellow py-2.5 px-2 text-center text-[13px] border-r border-cert-border shrink-0">检校日期</div>
+            <div class="flex-1 py-2.5 px-2 text-[13px]" id="calDate"></div>
+        </div>
+    </div>
+
+    <!-- 错误提示 -->
+    <div class="text-red-500 text-[13px] pb-2 px-2.5 hidden" id="errorTip"></div>
+
+    <!-- 底部 -->
+    <div class="text-center text-xs text-gray-500 mt-12 sm:mt-20 py-2.5 leading-relaxed">
+        版权所有:中计计量检测有限公司<br>
+        技术支持: 顶立软件(6.0)
+    </div>
+</div>
+
+<script>
+    const mockData = [
+        { certNo: '202403601767', barcode: 'TM20240001', certUnit: '苏州市建设工程质量检测中心有限公司', deviceName: '便携式可燃气体检测仪', modelSpec: 'EM-20', sampleNo: '25F-Z JGJ26', manufacturer: 'AIKE', calDate: '2024-03-05' },
+
+    ];
+
+    function clearTable() {
+        ['certNoCell', 'certUnitCell', 'deviceName', 'modelSpec', 'sampleNo', 'manufacturer', 'calDate'].forEach(function(id) {
+            document.getElementById(id).textContent = '';
+        });
+        document.getElementById('errorTip').classList.add('hidden');
+    }
+
+    function showError(msg) {
+        clearTable();
+        document.getElementById('errorTip').textContent = msg;
+        document.getElementById('errorTip').classList.remove('hidden');
+    }
+
+    function search() {
+        var no = document.getElementById('certNo').value.trim();
+        var unit = document.getElementById('certUnit').value.trim();
+
+        if (!no || !unit) { clearTable(); return; }
+
+        var result = null;
+        for (var i = 0; i < mockData.length; i++) {
+            var item = mockData[i];
+            var noMatch = (item.certNo === no || item.barcode === no);
+            var unitMatch = item.certUnit.indexOf(unit) !== -1;
+            console.log('输入编号:', no, '| 输入单位:', unit);
+            console.log('比对编号:', item.certNo, item.barcode, '| 编号匹配:', noMatch);
+            console.log('比对单位:', item.certUnit, '| 单位匹配:', unitMatch);
+            if (noMatch && unitMatch) { result = item; break; }
+        }
+
+        if (result) {
+            document.getElementById('certNoCell').textContent = result.certNo;
+            document.getElementById('certUnitCell').textContent = result.certUnit;
+            document.getElementById('deviceName').textContent = result.deviceName;
+            document.getElementById('modelSpec').textContent = result.modelSpec;
+            document.getElementById('sampleNo').textContent = result.sampleNo;
+            document.getElementById('manufacturer').textContent = result.manufacturer;
+            document.getElementById('calDate').textContent = result.calDate;
+            document.getElementById('errorTip').classList.add('hidden');
+        } else {
+            showError('未查询到数据，请与我们联系确定是否为真证书');
+        }
+    }
+
+    document.getElementById('certNo').addEventListener('input', search);
+    document.getElementById('certUnit').addEventListener('input', search);
+</script>
+</body>
+</html>
