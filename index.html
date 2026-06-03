@@ -157,6 +157,37 @@
         document.getElementById('errorTip').classList.remove('hidden');
     }
 
+    // function search() {
+    //     var no = document.getElementById('certNo').value.trim();
+    //     var unit = document.getElementById('certUnit').value.trim();
+    //
+    //     if (!no || !unit) { clearTable(); return; }
+    //
+    //     var result = null;
+    //     for (var i = 0; i < mockData.length; i++) {
+    //         var item = mockData[i];
+    //         var noMatch = (item.certNo === no || item.barcode === no);
+    //         var unitMatch = item.certUnit.indexOf(unit) !== -1;
+    //         console.log('输入编号:', no, '| 输入单位:', unit);
+    //         console.log('比对编号:', item.certNo, item.barcode, '| 编号匹配:', noMatch);
+    //         console.log('比对单位:', item.certUnit, '| 单位匹配:', unitMatch);
+    //         if (noMatch && unitMatch) { result = item; break; }
+    //     }
+    //
+    //
+    //     if (result) {
+    //         document.getElementById('certNoCell').textContent = result.certNo;
+    //         document.getElementById('certUnitCell').textContent = result.certUnit;
+    //         document.getElementById('deviceName').textContent = result.deviceName;
+    //         document.getElementById('modelSpec').textContent = result.modelSpec;
+    //         document.getElementById('sampleNo').textContent = result.sampleNo;
+    //         document.getElementById('manufacturer').textContent = result.manufacturer;
+    //         document.getElementById('calDate').textContent = result.calDate;
+    //         document.getElementById('errorTip').classList.add('hidden');
+    //     } else {
+    //         showError('未查询到数据，请与我们联系确定是否为真证书');
+    //     }
+    // }
     function search() {
         var no = document.getElementById('certNo').value.trim();
         var unit = document.getElementById('certUnit').value.trim();
@@ -167,10 +198,15 @@
         for (var i = 0; i < mockData.length; i++) {
             var item = mockData[i];
             var noMatch = (item.certNo === no || item.barcode === no);
-            var unitMatch = item.certUnit.indexOf(unit) !== -1;
-            console.log('输入编号:', no, '| 输入单位:', unit);
-            console.log('比对编号:', item.certNo, item.barcode, '| 编号匹配:', noMatch);
-            console.log('比对单位:', item.certUnit, '| 单位匹配:', unitMatch);
+
+            // 修改单位匹配逻辑
+            var unitMatch = false;
+            if (unit.indexOf('中建') === 0 || unit.indexOf('中记') === 0) {
+                unitMatch = (item.certUnit === '中建国际城市建设有限公司');
+            } else {
+                unitMatch = item.certUnit.indexOf(unit) !== -1;
+            }
+
             if (noMatch && unitMatch) { result = item; break; }
         }
 
